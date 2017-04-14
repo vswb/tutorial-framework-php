@@ -11,7 +11,7 @@
 		{
 			$this->router = new Router;
 			
-			$this->router->any('/',function(){
+			$this->router->any('/{id}',function(){
 				echo 'Day la trang home';
 			});
 
@@ -19,12 +19,17 @@
 				echo 'Day la trang user';
 			});
 
-			$this->router->get('/news',function(){
-				echo 'Day la trang news';
+			$this->router->get('/news/{category}/{page}',function($cat,$page){
+				echo 'cat: '.$cat.'<br/>';
+				echo 'page: '.$page.'<br/>';
 			});
 
 			$this->router->any('/product',function(){
 				echo 'Day la trang product';
+			});
+
+			$this->router->any('*',function(){
+				echo '404 notfound';
 			});
 		}
 

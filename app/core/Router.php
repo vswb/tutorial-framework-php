@@ -41,24 +41,56 @@
 
 		public function map(){
 
+			$checkRoute = false;
+			$params 	= [];
+
 			$requestURL = $this->getRequestURL();
 			$requestMethod = $this->getRequestMethod();
 			$routers = $this->routers;
 			
 			foreach( $routers as $route ){
 				list($method,$url,$action) = $route;
-				if( strpos($method, $requestMethod) !== FALSE ){
+
+				if( strpos($method, $requestMethod) === FALSE ){
+					continue;
+				}
+
+				if( $url === '*' ){
+					$checkRoute = true;
+				}elseif( strpos($url, '{') === FALSE ){
 					if( strcmp(strtolower($url), strtolower($requestURL)) === 0 ){
-						if( is_callable($action) ){
-							$action();
-							return;
-						}
+						$checkRoute = true;
 					}else{
 						continue;
 					}
+				}elseif( strpos($url, '}') === FALSE ){
+					continue;
+				}else{
+					$routeParams 	= explode('/', $url);
+					$requestParams 	= explode('/', $requestURL);
+
+					if( count($routeParams) !== count($requestParams) ){
+						continue;
+					}
+
+					foreach( $routeParams as $k => $rp ){
+						if( preg_match('/^{\w+}$/',$rp) ){
+							$params[] = $requestParams[$k];
+						}
+					}
+					
+					$checkRoute = true;
+				}
+
+				if( $checkRoute === true ){
+					if( is_callable($action) ){
+						call_user_func_array($action, $params);
+					}
+					return;
 				}else{
 					continue;
 				}
+
 			}
 			return;
 		}
