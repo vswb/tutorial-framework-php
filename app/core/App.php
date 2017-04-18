@@ -1,5 +1,6 @@
 <?php
 	require_once(dirname(__FILE__).'/Router.php');
+	require_once(dirname(__FILE__).'/../controllers/HomeController.php');
 	/**
 	* App
 	*/
@@ -11,6 +12,8 @@
 		{
 			$this->router = new Router;
 			
+			$this->router->get('/{list}/{page}','HomeController@index');
+
 			$this->router->any('/{id}',function(){
 				echo 'Day la trang home';
 			});

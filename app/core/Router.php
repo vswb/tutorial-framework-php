@@ -86,13 +86,39 @@
 					if( is_callable($action) ){
 						call_user_func_array($action, $params);
 					}
+					elseif( is_string($action) ){
+						$this->compieRoute($action,$params);
+					}
 					return;
 				}else{
 					continue;
 				}
-
 			}
 			return;
+		}
+
+		private function compieRoute($action, $params){
+
+			if( count(explode('@', $action)) !== 2 ){
+				die('Router error');
+			}
+
+			$className = explode('@', $action)[0];
+			$methodName = explode('@', $action)[1];
+
+			$classNamespace = 'app\\controllers\\'.$className;
+
+			if( class_exists($classNamespace) ){
+				$object = new $classNamespace;
+
+				if( method_exists($classNamespace, $methodName) ){
+					call_user_func_array([$object,$methodName], $params);
+				}else{
+					die('Method "'.$methodName.'" not found');
+				}
+			}else{
+				die('Class "'.$classNamespace.'" not found');
+			}
 		}
 
 		function run(){
